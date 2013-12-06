@@ -1,5 +1,5 @@
 NAME=chruby
-VERSION=0.3.4
+VERSION=0.3.8
 AUTHOR=postmodern
 URL=https://github.com/$(AUTHOR)/$(NAME)
 
@@ -11,7 +11,7 @@ DOC_FILES=*.md *.txt
 PKG_DIR=pkg
 PKG_NAME=$(NAME)-$(VERSION)
 PKG=$(PKG_DIR)/$(PKG_NAME).tar.gz
-SIG=$(PKG_DIR)/$(PKG_NAME).asc
+SIG=$(PKG).asc
 
 PREFIX?=/usr/local
 DOC_DIR=$(PREFIX)/share/doc/$(PKG_NAME)
@@ -29,7 +29,7 @@ sign: $(PKG)
 	gpg --sign --detach-sign --armor $(PKG)
 	git add $(PKG).asc
 	git commit $(PKG).asc -m "Added PGP signature for v$(VERSION)"
-	git push
+	git push origin master
 
 verify: $(PKG) $(SIG)
 	gpg --verify $(SIG) $(PKG)
@@ -39,14 +39,17 @@ clean:
 
 all: $(PKG) $(SIG)
 
-test:
-	SHELL=`which bash` ./test/runner
-	SHELL=`which zsh`  ./test/runner
+test/opt/rubies:
+	./test/setup
+
+test: test/opt/rubies
+	SHELL=`command -v bash` ./test/runner
+	SHELL=`command -v zsh`  ./test/runner
 
 tag:
-	git push
-	git tag -s -m "Tagging $(VERSION)" v$(VERSION)
-	git push --tags
+	git push origin master
+	git tag -s -m "Releasing $(VERSION)" v$(VERSION)
+	git push origin master --tags
 
 release: tag download sign
 

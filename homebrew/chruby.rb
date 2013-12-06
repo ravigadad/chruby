@@ -2,8 +2,9 @@ require 'formula'
 
 class Chruby < Formula
   homepage 'https://github.com/postmodern/chruby#readme'
-  url 'https://github.com/postmodern/chruby/archive/v0.3.4.tar.gz'
-  sha1 '28445cd75f514b299f6b2f2bf123793d8739a99b'
+  url 'https://github.com/postmodern/chruby/archive/v0.3.8.tar.gz'
+  sha1 '320d13bacafeae72631093dba1cd5526147d03cc'
+
   head 'https://github.com/postmodern/chruby.git'
 
   def install
@@ -11,18 +12,16 @@ class Chruby < Formula
   end
 
   def caveats; <<-EOS.undent
+    Add the following to the ~/.bashrc or ~/.zshrc file:
 
-    Add the following to the /etc/profile.d/chruby.sh, ~/.bashrc or
-    ~/.zshenv file:
-
-      source #{HOMEBREW_PREFIX}/opt/chruby/share/chruby/chruby.sh
+      source #{opt_prefix}/share/chruby/chruby.sh
 
     By default chruby will search for Rubies installed into /opt/rubies/ or
     ~/.rubies/. For non-standard installation locations, simply set the RUBIES
-    variable:
+    variable after loading chruby.sh:
 
       RUBIES=(
-        /opt/rubies/jruby-1.7.0
+        /opt/jruby-1.7.0
         $HOME/src/rubinius
       )
 
@@ -30,13 +29,12 @@ class Chruby < Formula
 
       RVM:   RUBIES=(~/.rvm/rubies/*)
       rbenv: RUBIES=(~/.rbenv/versions/*)
-      rbfu:  RUBIES=('~/.rbfu/rubies/*)
+      rbfu:  RUBIES=(~/.rbfu/rubies/*)
 
     To enable auto-switching of Rubies specified by .ruby-version files,
-    add the following to ~/.bash_profile or ~/.zshrc:
+    add the following to ~/.bashrc or ~/.zshrc:
 
-      source #{HOMEBREW_PREFIX}/opt/chruby/share/chruby/auto.sh
-
+      source #{opt_prefix}/share/chruby/auto.sh
     EOS
   end
 end

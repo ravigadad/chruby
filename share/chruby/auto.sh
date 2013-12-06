@@ -1,42 +1,31 @@
-unset RUBY_VERSION_FILE
+unset RUBY_AUTO_VERSION
 
 function chruby_auto() {
-	local dir="$PWD"
-	local version_file
+	local dir="$PWD" version
 
 	until [[ -z "$dir" ]]; do
-		version_file="$dir/.ruby-version"
-
-		if   [[ "$version_file" == "$RUBY_VERSION_FILE" ]]; then return
-		elif [[ -f "$version_file" ]]; then
-			chruby $(cat "$version_file") || return 1
-
-			export RUBY_VERSION_FILE="$version_file"
-			return
+		if { read -r version <"$dir/.ruby-version"; } 2>/dev/null || [[ -n "$version" ]]; then
+			if [[ "$version" == "$RUBY_AUTO_VERSION" ]]; then return
+			else
+				RUBY_AUTO_VERSION="$version"
+				chruby "$version"
+				return $?
+			fi
 		fi
 
 		dir="${dir%/*}"
 	done
 
-	if [[ -n "$RUBY_VERSION_FILE" ]]; then
+	if [[ -n "$RUBY_AUTO_VERSION" ]]; then
 		chruby_reset
-		unset RUBY_VERSION_FILE
+		unset RUBY_AUTO_VERSION
 	fi
 }
 
 if [[ -n "$ZSH_VERSION" ]]; then
-	if [[ ! "$precmd_functions" == *chruby_auto* ]]; then
-		precmd_functions+=("chruby_auto")
+	if [[ ! "$preexec_functions" == *chruby_auto* ]]; then
+		preexec_functions+=("chruby_auto")
 	fi
 elif [[ -n "$BASH_VERSION" ]]; then
-	PROMPT_COMMAND="${PROMPT_COMMAND%% }"
-
-	if [[ -n "$PROMPT_COMMAND" ]]; then
-		if [[ ! "$PROMPT_COMMAND" == *chruby_auto* ]]; then
-			PROMPT_COMMAND="${PROMPT_COMMAND%%;}"
-			PROMPT_COMMAND="$PROMPT_COMMAND; chruby_auto"
-		fi
-	else
-		PROMPT_COMMAND="chruby_auto"
-	fi
+	trap '[[ "$BASH_COMMAND" != "$PROMPT_COMMAND" ]] && chruby_auto' DEBUG
 fi

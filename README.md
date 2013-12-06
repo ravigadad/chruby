@@ -1,5 +1,7 @@
 # chruby
 
+[![Build Status](https://travis-ci.org/postmodern/chruby.png)](https://travis-ci.org/postmodern/chruby)
+
 Changes the current Ruby.
 
 ## Features
@@ -30,10 +32,10 @@ Changes the current Ruby.
 
 ## Install
 
-    wget -O chruby-0.3.4.tar.gz https://github.com/postmodern/chruby/archive/v0.3.4.tar.gz
-    tar -xzvf chruby-0.3.4.tar.gz
-    cd chruby-0.3.4/
-    make install
+    wget -O chruby-0.3.8.tar.gz https://github.com/postmodern/chruby/archive/v0.3.8.tar.gz
+    tar -xzvf chruby-0.3.8.tar.gz
+    cd chruby-0.3.8/
+    sudo make install
 
 ### PGP
 
@@ -41,13 +43,13 @@ All releases are [PGP] signed for security. Instructions on how to import my
 PGP key can be found on my [blog][1]. To verify that a release was not tampered 
 with:
 
-    wget https://raw.github.com/postmodern/chruby/master/pkg/chruby-0.3.4.tar.gz.asc
-    gpg --verify chruby-0.3.4.tar.gz.asc chruby-0.3.4.tar.gz
+    wget https://raw.github.com/postmodern/chruby/master/pkg/chruby-0.3.8.tar.gz.asc
+    gpg --verify chruby-0.3.8.tar.gz.asc chruby-0.3.8.tar.gz
 
 ### setup.sh
 
 chruby also includes a `setup.sh` script, which installs chruby and the latest
-releases of [MRI], [JRuby] and [Rubinius]. Simply run the script as root or 
+releases of [Ruby], [JRuby] and [Rubinius]. Simply run the script as root or 
 via `sudo`:
 
     sudo ./scripts/setup.sh
@@ -60,9 +62,15 @@ chruby can also be installed with [homebrew]:
 
 ### Arch Linux
 
-chruby is already included in the [AUR](https://aur.archlinux.org/):
+chruby is already included in the [AUR]:
 
     yaourt -S chruby
+    
+### FreeBSD
+
+chruby is included in the official [FreeBSD ports collection]:
+
+    cd /usr/ports/devel/chruby/ && make install clean
 
 ### Rubies
 
@@ -70,9 +78,21 @@ chruby is already included in the [AUR](https://aur.archlinux.org/):
 
 Chruby provides detailed instructions for installing additional Rubies:
 
-* [MRI](https://github.com/postmodern/chruby/wiki/MRI)
+* [Ruby](https://github.com/postmodern/chruby/wiki/Ruby)
 * [JRuby](https://github.com/postmodern/chruby/wiki/JRuby)
 * [Rubinius](https://github.com/postmodern/chruby/wiki/Rubinius)
+* [MagLev](https://github.com/postmodern/chruby/wiki/MagLev)
+
+#### ruby-install
+
+You can also use [ruby-install] to install additional Rubies:
+
+Installing to `/opt/rubies` or `~/.rubies`:
+
+    ruby-install ruby
+    ruby-install jruby
+    ruby-install rubinius
+    ruby-install maglev
 
 #### ruby-build
 
@@ -83,18 +103,18 @@ Installing to `/opt/rubies`:
     ruby-build 1.9.3-p392 /opt/rubies/ruby-1.9.3-p392
     ruby-build jruby-1.7.3 /opt/rubies/jruby-1.7.3
     ruby-build rbx-2.0.0-rc1 /opt/rubies/rubinius-2.0.0-rc1
-
+    ruby-build maglev-1.0.0 /opt/rubies/maglev-1.0.0
 
 ## Configuration
 
 Add the following to the `/etc/profile.d/chruby.sh`, `~/.bashrc` or
-`~/.zshenv` file:
+`~/.zshrc` file:
 
     source /usr/local/share/chruby/chruby.sh
 
 By default chruby will search for Rubies installed into `/opt/rubies/` or
 `~/.rubies/`. For non-standard installation locations, simply set the
-`RUBIES` variable:
+`RUBIES` variable after loading `chruby.sh`:
 
     RUBIES=(
       /opt/jruby-1.7.0
@@ -121,8 +141,8 @@ If you wish to enable chruby system-wide, add the following to
 ### Auto-Switching
 
 If you want chruby to auto-switch the current version of Ruby when you `cd`
-between your different projects, simply load `auto.sh` in `~/.bash_profile`
-or `~/.zshrc`:
+between your different projects, simply load `auto.sh` in `~/.bashrc` or
+`~/.zshrc`:
 
     source /usr/local/share/chruby/auto.sh
 
@@ -130,10 +150,14 @@ chruby will check the current and parent directories for a [.ruby-version]
 file. Other Ruby switchers also understand this file:
 https://gist.github.com/1912050
 
+If you want to automatically run the version of a gem executable specified in 
+your project's Gemfile, try 
+[rubygems-bundler](https://github.com/mpapis/rubygems-bundler).
+
 ### Default Ruby
 
-If you wish to set a default Ruby, simply call `chruby` in `~/.bashrc` or
-`~/.zshrc`:
+If you wish to set a default Ruby, simply call `chruby` in `~/.bash_profile` or
+`~/.zprofile`:
 
     chruby ruby-1.9
 
@@ -145,11 +169,14 @@ If you have enabled auto-switching, simply create a `.ruby-version` file:
 
 For instructions on using chruby with other tools, please see the [wiki]:
 
-* [Emacs](https://github.com/arnebrasseur/chruby.el#readme)
+* [Capistrano](https://github.com/capistrano/chruby#readme)
+* [Chef](https://github.com/Atalanta/chef-chruby#readme)
 * [Cron](https://github.com/postmodern/chruby/wiki/Cron)
-* [Capistrano](https://github.com/postmodern/chruby/wiki/Capistrano)
 * [Emacs](https://github.com/arnebrasseur/chruby.el#readme)
 * [Pow](https://github.com/postmodern/chruby/wiki/Pow)
+* [Puppet](https://github.com/dgoodlad/puppet-chruby#readme)
+* [Sudo](https://github.com/postmodern/chruby/wiki/Sudo)
+* [Vim](https://github.com/postmodern/chruby/wiki/Vim)
 
 ## Examples
 
@@ -212,6 +239,12 @@ Switch to an arbitrary Ruby on the fly:
 
     $ chruby_use /path/to/ruby
 
+## Uninstall
+
+After removing the chruby configuration:
+
+    $ sudo make uninstall
+
 ## Alternatives
 
 * [RVM]
@@ -239,6 +272,11 @@ Switch to an arbitrary Ruby on the fly:
 
 -- [Steve Klabnik](http://blog.steveklabnik.com/posts/2012-12-13-getting-started-with-chruby)
 
+> So far, I'm a huge fan. The tool does what it advertises exactly and simply.
+> The small feature-set is also exactly and only the features I need.
+
+-- [Patrick Brisbin](http://pbrisbin.com/posts/chruby)
+
 > I wrote ruby-version; however, chruby is already what ruby-version wanted to
 > be. I've deprecated ruby-version in favor of chruby.
 
@@ -247,7 +285,8 @@ Switch to an arbitrary Ruby on the fly:
 ## Credits
 
 * [mpapis](https://github.com/mpapis) for reviewing the code.
-* [havenn](https://github.com/havenwood) for handling the homebrew formula.
+* [havenwood](https://github.com/havenwood) for handling the homebrew formula.
+* [zendeavor](https://github.com/zendeavor) for style fixes.
 * `#bash`, `#zsh`, `#machomebrew` for answering all my questions.
 
 [wiki]: https://github.com/postmodern/chruby/wiki
@@ -255,7 +294,10 @@ Switch to an arbitrary Ruby on the fly:
 [bash]: http://www.gnu.org/software/bash/
 [zsh]: http://www.zsh.org/
 [PGP]: http://en.wikipedia.org/wiki/Pretty_Good_Privacy
-[homebrew]: http://mxcl.github.com/homebrew/
+[homebrew]: http://brew.sh/
+[AUR]: https://aur.archlinux.org/packages/chruby/
+[FreeBSD ports collection]: https://www.freshports.org/devel/chruby/
+[ruby-install]: https://github.com/postmodern/ruby-install#readme
 [ruby-build]: https://github.com/sstephenson/ruby-build#readme
 [.ruby-version]: https://gist.github.com/1912050
 
@@ -265,7 +307,7 @@ Switch to an arbitrary Ruby on the fly:
 [ry]: https://github.com/jayferd/ry#readme
 [ruby-version]: https://github.com/wilmoore/ruby-version#readme
 
-[MRI]: http://www.ruby-lang.org/en/
+[Ruby]: http://www.ruby-lang.org/en/
 [JRuby]: http://jruby.org/
 [Rubinius]: http://rubini.us/
 

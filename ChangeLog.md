@@ -1,3 +1,110 @@
+### 0.3.8 / 2013-12-04
+
+#### chruby.sh
+
+* Remove trailing slashes from ruby directories when iterating over `RUBIES`.
+  (@halostatue)
+* Ensure all temporary variables are local or unset.
+
+#### auto.sh
+
+* Ensure that `chruby_auto` can read `.ruby-version` files that do not end with
+  a new-line. (@hosiawak)
+
+#### scripts/setup.sh
+
+* Install ruby-install 0.3.3.
+
+#### scripts/bug_report.sh
+
+* Print `$HOME`, `$RUBY_AUTO_VERSION`.
+* Print `trap -p`, `$preexec_functions` and `$precmd_functions`.
+* Print env variables even when they are empty.
+
+### 0.3.7 / 2013-08-18
+
+* Multiple style changes and optimizations. (@zendeavor)
+* Safely glob the contents of `/opt/rubies` and `~/.rubies`.
+  This prevents nullglob errors under zsh and `.rbx` directories from being
+  added to `RUBIES`.
+* Unset `GEM_PATH` in `chruby_reset` if it has become empty.
+  Allows the RubyGems to use the default `GEM_PATH`.
+* Safely quote `RUBIES[@]` to prevent implicit word-splitting when listing
+ `RUBIES`.
+* Map `-V` to `--version` in `chruby`. (@havenwood)
+* Added benchmarks.
+
+#### auto.sh
+
+* Unset `RUBY_AUTO_VERSION` when loaded. Forces sub-shells to re-detect any
+  `.ruby-version` file. (@KevinSjoberg)
+* No longer export `RUBY_AUTO_VERSION`. Allows new windows in tmux to detect
+  the `.ruby-version` file.
+* Set `RUBY_AUTO_VERSION` even if `.ruby-version` contains an unknown Ruby.
+  Prevents `chruby` from printing errors after every command.
+* Fixed a typo where `RUBY_VERSION_FILE` was still being used. (@KevinSjoberg)
+
+#### chruby-exec
+
+* If stdin is a TTY, then spawn an interactive shell.
+
+### 0.3.6 / 2013-06-23
+
+* `chruby_use` no longer echos the selected Ruby.
+
+#### chruby-exec
+
+* Now runs under bash.
+* Load `chruby.sh` for `CHRUBY_VERSION`.
+
+#### auto.sh
+
+* Record and compare the contents of `.ruby-version` files in order to detect
+  modifications, such as when switching between branches.
+
+### 0.3.5 / 2013-05-28
+
+* Added a RPM spec.
+* Respect `PREFIX` when auto-detecting `/opt/rubies/*`.
+* Do not set `GEM_ROOT` if rubygems is not installed (Charlie Somerville).
+* `chruby_use` now echos the select ruby and the version, only if the shell is
+  in interactive mode (Brian D. Burns).
+* `chruby_reset` no longer accidentally removes `/bin` if `GEM_HOME` or
+  `GEM_ROOT` are empty (David Grayson).
+* `chruby` now selects the last lexical match for the given ruby.
+
+#### auto.sh
+
+* Ensure that auto-switching works in non-interactive mode:
+  * zsh: use `preexec_functions` which runs in both interactive and
+    non-interactive sessions.
+  * bash: use `trap DEBUG` which runs before every command, in both interactive
+    and non-interactive mode. `PROMPT_COMMAND` only runs in interactive mode.
+* Fixed a serious design flaw, where `chruby_auto` passed the contents of
+  `.ruby-version` as multiple arguments to the `chruby` function. Originally,
+  this allowed for `.ruby-version` files to specify additional `RUBYOPT` options
+  (ex: `jruby --1.8`). However, an attacker could craft a malicious
+  `.ruby-version` file that would require arbitrary code
+  (ex: `1.9.3 -r./evil.rb`). The `./evil.rb` file would then be required when
+  `ruby` is invoked by `chruby_use` in order to determine `RUBY_ENGINE`,
+  `RUBY_VERSION`, `GEM_ROOT`.
+
+  In order to prevent the abuse of this feature, `chruby_auto` now passes the
+  entire contents of `.ruby-version` as a first and only argument to the
+  `chruby` function.
+
+  If you have `auto.sh` enabled, it is recommended that you upgrade.
+  If you cannot upgrade, consider disabling `auto.sh`.
+  If you want to scan your entire system for malicious `.ruby-version` files:
+
+        find / -name .ruby-version 2>/dev/null | xargs -i{} grep -H " " {}
+
+  Thanks to David Grayson for reporting this flaw.
+
+#### scripts/setup.sh
+
+* Do not assume bash is installed at `/bin/bash` (Shannon Skipper).
+
 ### 0.3.4 / 2013-02-28
 
 * Prepend the new gem paths to `GEM_PATH` in `chruby_use`, instead of

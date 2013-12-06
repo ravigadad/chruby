@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CHRUBY_VERSION="0.3.4"
+source "${0%/*}/../share/chruby/chruby.sh"
 
 function chruby_version_from_file() {
 	local dir="$PWD"
@@ -20,18 +20,18 @@ function chruby_version_from_file() {
 
 case "$1" in
 	-h|--help)
-		echo "usage: chruby-exec RUBY [RUBYOPTS] -- COMMAND"
-		echo "   or: chruby-exec -- COMMAND"
+		echo "usage: chruby-exec RUBY [RUBYOPTS] -- COMMAND [ARGS...]"
+		echo "   or: chruby-exec -- COMMAND [ARGS...]"
 		echo "  (in second form, will attempt to use .ruby-version file)"
 		exit
 		;;
-	-v|--version)
+	-V|--version)
 		echo "chruby version $CHRUBY_VERSION"
 		exit
 		;;
 esac
 
-if [[ $# -eq 0 ]]; then
+if (( $# == 0 )); then
 	echo "chruby-exec: RUBY and COMMAND required" >&2
 	exit 1
 fi
@@ -53,9 +53,13 @@ if [[ ! $ruby_args ]]; then
 	exit 1
 fi
 
-if [[ $# -eq 0 ]]; then
+if (( $# == 0 )); then
 	echo "chruby-exec: COMMAND required" >&2
 	exit 1
 fi
 
-exec $SHELL -l -i -c "chruby $ruby_args && $*"
+command="chruby $ruby_args && $*"
+
+if [[ -t 0 ]]; then exec "$SHELL" -i -l -c "$command"
+else                exec "$SHELL"    -l -c "$command"
+fi
